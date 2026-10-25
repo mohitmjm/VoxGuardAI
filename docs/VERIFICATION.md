@@ -29,3 +29,7 @@ npm run build
 ## Unverified external operations
 
 Docker build could not install FFmpeg because `deb.debian.org` could not resolve within build containers despite supported host-network/proxy diagnosis. No TLS or artifact verification was bypassed. Windows setup, CUDA and hosted CI have not been executed here. No public deployment was performed.
+
+## Research validation continuation
+
+The complete `pytest tests research ml -q` suite passed 93 tests (one upstream TestClient deprecation warning) using Python3.12/PyTorch2.6CPU. Node20.20.2 ran16 frontend tests successfully and the production build passed. Fresh Chromium uploads through Vite5190 to FastAPI8020 exercised actual human and classical synthetic speech, model-score display, JSON download, and mobile layout without mocks. No frontend/backend application logic was changed by the research continuation. The new engineering run deliberately reused the same six pilot recordings; no new representative corpus or production thresholds were obtained. See `research/validation/` for preserved evidence and exact reproduction.

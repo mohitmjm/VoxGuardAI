@@ -40,3 +40,7 @@ Required domains for future authorized acquisition: `www.asvspoof.org`, `zenodo.
 ## Corpus ingestion requirements
 
 Use the existing manifest schema: `audio_path,label,speaker_id,source_id,generator,split,language`. Keep source recordings and all derivatives in one partition; namespace IDs globally and preserve original speaker and generator family information. Audit manifests before inference. For a generator-held-out study, exclude held-out generator families from both training **and validation**, not just training. ASVspoof pretrained overlap must be checked against the checkpoint's original training set. Store rights, license version, acquisition URL, record count, hashes, and consent restrictions alongside a frozen manifest.
+
+## Current validation acquisition tools
+
+See [VALIDATION_ACCESS.md](VALIDATION_ACCESS.md) for the new authoritative access/rights investigation, bounded resume downloader, strict manual/partial imports and ASVspoof5 baseline protocol adapter. No new representative modern-synthesis corpus was acquired. Tests: `python -m pytest research/datasets/test_acquisition.py -q`.

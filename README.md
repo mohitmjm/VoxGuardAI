@@ -36,3 +36,5 @@ Optional validation-derived decisions: see [decision policy](docs/DECISION_POLIC
 Research report dashboard: set `VOXGUARD_RESEARCH_REPORTS_PATH` to a trusted offline summary JSON (for example `research/results/pilot_dashboard.json`) before starting the backend. The dashboard always shows dataset, count, model and conditions; no metrics are generated from user uploads. The bundled six-recording pilot is not a benchmark. See `research/paper/manuscript.md` and `research/datasets/README.md`.
 
 Optional research speech embeddings are extracted separately; they are not a second validated detector. See `ml/README.md`. Windows can run `powershell -File scripts/run.ps1` after setup; a separate terminal runs `cd frontend; npm run dev`.
+
+Research validation: [single-command runner](research/validation/README.md), [dataset access and manual import](research/datasets/VALIDATION_ACCESS.md), and [reproducibility record](docs/RESEARCH_REPRODUCIBILITY.md). The IEEE-style manuscript source and compiled PDF are in `research/paper/`; representative validation/test data remain unavailable, and no deployment policy has been enabled.

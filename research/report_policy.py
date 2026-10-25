@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import numpy as np
 from ml.policy import validate_artifact, SCORE_PROTOCOL
@@ -27,6 +28,15 @@ def evaluate(rows, artifact, expected_checkpoint_sha256):
             raise ValueError('Test identity metadata is required')
         if any(hashlib.sha256(r[field].encode()).hexdigest() in ids[field] for r in rows):
             raise ValueError(f'Validation/test {field} leakage detected')
+    validated_audio = set(artifact.get('validation_audio_sha256', []))
+    if validated_audio:
+        hashes = [r.get('audio_sha256') for r in rows]
+        if any(not isinstance(value, str) or not re.fullmatch(r'[0-9a-f]{64}', value) for value in hashes):
+            raise ValueError('Test audio digest provenance is required')
+        if len(set(hashes)) != len(hashes):
+            raise ValueError('Duplicate test recording content')
+        if validated_audio.intersection(hashes):
+            raise ValueError('Validation/test recording-content leakage detected')
     scores = [float(r['score']) for r in rows]
     predictions = [policy.classify(s) for s in scores]
     matrix = [[sum(r['label'] == label and p == prediction for r, p in zip(rows, predictions)) for prediction in ('human', 'ai', 'uncertain')] for label in ('human', 'ai')]

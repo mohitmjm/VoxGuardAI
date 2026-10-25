@@ -1,0 +1,142 @@
+{
+  "dataset": "Existing six-recording engineering smoke only",
+  "conditions": "Three licensed LibriSpeech excerpts and three classical Flite recordings; not independent representative research evidence; no validation partition",
+  "test_ranking": {
+    "sample_count": 6,
+    "class_counts": {
+      "human": 3,
+      "ai": 3
+    },
+    "speaker_count": 6,
+    "auroc": 1.0,
+    "eer": 0.0,
+    "latency_ms": {
+      "median": 695.5741545002638,
+      "p95": 1338.5164742501274
+    },
+    "binary_decision_metrics": null,
+    "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+  },
+  "validation_count": 0,
+  "policy_status": "not_established",
+  "policy": null,
+  "test_decisions": null,
+  "policy_failure": "Validation CSV is empty",
+  "robustness": {
+    "aac_64k": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 758.7262090000877,
+          "p95": 1223.9087680006833
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    },
+    "clean": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 770.0147205000576,
+          "p95": 1446.8299960001332
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    },
+    "mp3_32k": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 755.3456264995475,
+          "p95": 1197.374373499997
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    },
+    "mp3_64k": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 763.7100189995181,
+          "p95": 1208.676593500286
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    },
+    "white_noise_10db": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 753.5622124996735,
+          "p95": 1197.9725477503962
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    },
+    "white_noise_20db": {
+      "ranking": {
+        "sample_count": 6,
+        "class_counts": {
+          "human": 3,
+          "ai": 3
+        },
+        "speaker_count": 6,
+        "auroc": 1.0,
+        "eer": 0.0,
+        "latency_ms": {
+          "median": 750.1781304999895,
+          "p95": 1207.2955189998993
+        },
+        "binary_decision_metrics": null,
+        "warning": "Ranking is descriptive; no decision threshold is selected using these test scores."
+      }
+    }
+  },
+  "robustness_observations": 36,
+  "robustness_warning": "Conditions are paired repeated observations, not independent recordings. No thresholds are refitted on transformed test data.",
+  "elapsed_seconds": 37.58528644600028,
+  "status": "completed",
+  "evidence_type": "Engineering regression on reused six-clip convenience pilot; not a new benchmark",
+  "validation_data_available": false,
+  "source_run": "artifacts/validation/engineering-smoke/"
+}

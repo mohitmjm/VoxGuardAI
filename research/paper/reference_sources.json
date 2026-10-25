@@ -1,0 +1,26 @@
+[
+  {
+    "source": "AASIST and RawNet2 and ASVspoof2019 official bibliography",
+    "url": "https://raw.githubusercontent.com/clovaai/aasist/main/README.md",
+    "status": "retrieved",
+    "sha256": "409c7ce52ce20d3e13adab731e52ce65a153fb0aed5ac6d5434e1661aa9cb253"
+  },
+  {
+    "source": "WaveFake official authors citation",
+    "url": "https://raw.githubusercontent.com/RUB-SysSec/WaveFake/main/README.md",
+    "status": "retrieved",
+    "sha256": "0aca95df9f0bc093eaeeea04ade930e0fbe566fa16ae7a9c0f2743d5ea4e73c5"
+  },
+  {
+    "source": "wav2vec2 official authors implementation",
+    "url": "https://raw.githubusercontent.com/facebookresearch/fairseq/main/examples/wav2vec/README.md",
+    "status": "retrieved",
+    "sha256": "57e5a889b72a5f036379a3b7b6f645324b03a0cd5e9a5462c0756023b124809f"
+  },
+  {
+    "source": "wav2vec2 primary abstract",
+    "url": "https://arxiv.org/abs/2006.11477",
+    "status": "not_retrieved",
+    "reason": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  }
+]

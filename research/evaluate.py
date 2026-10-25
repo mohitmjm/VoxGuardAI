@@ -25,7 +25,7 @@ def manifest(path):
     if not rows:
         raise ValueError('Manifest is empty')
     for row in rows:
-        if any(not row[k].strip() for k in FIELDS):
+        if any(not isinstance(row.get(k), str) or not row[k].strip() for k in FIELDS):
             raise ValueError('Required manifest fields cannot be empty')
         if row['label'] not in {'human', 'ai'} or row['split'] not in {'train', 'validation', 'test'}:
             raise ValueError('Labels must be human/ai and splits train/validation/test')
@@ -46,11 +46,20 @@ def audit(rows, held_out_generators=False):
                 errors.append(f'{field} spans {previous} and {row["split"]}: {row[field]}')
     hashes = {}
     for row in rows:
-        digest = hashlib.sha256(Path(row['audio_path']).read_bytes()).hexdigest()
+        with Path(row['audio_path']).open('rb') as handle:
+            digest = hashlib.file_digest(handle, 'sha256').hexdigest()
         previous = hashes.setdefault(digest, row['split'])
         if previous != row['split']:
             errors.append('Identical audio bytes span splits')
     if held_out_generators:
+        placeholders = {'unknown','unspecified','unavailable','none','null','n/a','na','other','spoof','synthetic','ai','tts','voice-cloning'}
+        for row in rows:
+            if row.get('label') != 'ai':
+                continue
+            name = str(row.get('generator', '')).strip().lower().replace('_','-')
+            final_component = name.replace('/',':').split(':')[-1]
+            if not name or name in placeholders or final_component in placeholders or final_component.startswith(('unknown-','unspecified-')):
+                errors.append('Held-out generator evaluation requires known synthesis-system identifiers; unknown/unspecified provenance cannot establish an unseen generator')
         train = {r['generator'] for r in rows if r['split'] == 'train' and r['label'] == 'ai'}
         test = {r['generator'] for r in rows if r['split'] == 'test' and r['label'] == 'ai'}
         validation = {r['generator'] for r in rows if r['split'] == 'validation' and r['label'] == 'ai'}
@@ -62,7 +71,7 @@ def audit(rows, held_out_generators=False):
 
 
 def curves(y, scores):
-    y, scores = np.asarray(y, dtype=int), np.asarray(scores, dtype=float)
+    y, scores = np.asarray(y), np.asarray(scores, dtype=float)
     if y.ndim != 1 or scores.ndim != 1 or len(y) != len(scores) or not np.all(np.isfinite(scores)) or not np.all((scores >= 0) & (scores <= 1)):
         raise ValueError('Expected matching one-dimensional labels and finite [0,1] scores')
     if set(y.tolist()) != {0, 1}:
@@ -81,7 +90,7 @@ def curves(y, scores):
 
 
 def metrics(y, scores, threshold):
-    y, scores = np.asarray(y, dtype=int), np.asarray(scores, dtype=float)
+    y, scores = np.asarray(y), np.asarray(scores, dtype=float)
     if not math.isfinite(threshold) or not 0 <= threshold <= 1:
         raise ValueError('Threshold must be finite and in [0,1]')
     if not np.all(np.isfinite(scores)) or not np.all((scores >= 0) & (scores <= 1)):
@@ -161,7 +170,9 @@ def score(rows):
         audio = decode(row['audio_path'])
         start = time.perf_counter()
         prediction = service.analyze(audio, sample_rate=16000)
-        yield {**row, 'score': prediction['score'], 'latency_ms': (time.perf_counter()-start)*1000, 'duration_seconds': len(audio)/16000, 'checkpoint_sha256': SHA256, 'score_protocol': SCORE_PROTOCOL}
+        with Path(row['audio_path']).open('rb') as handle:
+            audio_digest = hashlib.file_digest(handle, 'sha256').hexdigest()
+        yield {**row, 'audio_sha256': audio_digest, 'score': prediction['score'], 'latency_ms': (time.perf_counter()-start)*1000, 'duration_seconds': len(audio)/16000, 'checkpoint_sha256': SHA256, 'score_protocol': SCORE_PROTOCOL}
 
 
 def main():

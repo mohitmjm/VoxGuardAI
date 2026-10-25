@@ -31,23 +31,30 @@ def compressed(audio, bitrate, codec="mp3"):
         return decode(path)
 
 
+def observations(rows, model=None, seed=42):
+    """Yield paired observations using one real detector; do not refit thresholds."""
+    from ml.service import ModelService
+    from ml.constants import SHA256
+    from ml.policy import SCORE_PROTOCOL
+    model = model or ModelService()
+    rng = np.random.default_rng(seed)
+    for row in rows:
+        audio = decode(row['audio_path'])
+        for condition, transformed in [('clean',audio),('white_noise_20db',noise(audio,20,rng)),('white_noise_10db',noise(audio,10,rng)),('mp3_32k',compressed(audio,'32k')),('mp3_64k',compressed(audio,'64k')),('aac_64k',compressed(audio,'64k','aac'))]:
+            start=time.perf_counter(); prediction=model.analyze(transformed,sample_rate=16000)
+            yield {**row,'condition':condition,'score':prediction['score'],'latency_ms':1000*(time.perf_counter()-start),'seed':seed,'checkpoint_sha256':SHA256,'score_protocol':SCORE_PROTOCOL}
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('manifest',type=Path); p.add_argument('--output',required=True,type=Path)
     p.add_argument('--seed',type=int,default=42)
     a=p.parse_args()
     rows=manifest(a.manifest); audit(rows)
-    from ml.service import ModelService
-    from ml.constants import SHA256
-    from ml.policy import SCORE_PROTOCOL
-    model=ModelService(); rng=np.random.default_rng(a.seed)
-    with a.output.open('w',newline='') as f:
-        fields=list(rows[0])+['condition','score','latency_ms','seed','checkpoint_sha256','score_protocol']
-        w=csv.DictWriter(f,fieldnames=fields); w.writeheader()
-        for row in rows:
-            audio=decode(row['audio_path'])
-            for condition, transformed in [('clean',audio),('white_noise_20db',noise(audio,20,rng)),('white_noise_10db',noise(audio,10,rng)),('mp3_32k',compressed(audio,'32k')),('mp3_64k',compressed(audio,'64k')),('aac_64k',compressed(audio,'64k','aac'))]:
-                start=time.perf_counter(); prediction=model.analyze(transformed,sample_rate=16000)
-                w.writerow({**row,'condition':condition,'score':prediction['score'],'latency_ms':1000*(time.perf_counter()-start),'seed':a.seed,'checkpoint_sha256':SHA256,'score_protocol':SCORE_PROTOCOL})
+    # Exclusive creation protects earlier measured evidence.
+    with a.output.open('x',newline='') as f:
+        iterator=iter(observations(rows,seed=a.seed))
+        first=next(iterator)
+        w=csv.DictWriter(f,fieldnames=list(first));w.writeheader();w.writerow(first);w.writerows(iterator)
 
 if __name__=='__main__': main()

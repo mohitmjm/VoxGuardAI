@@ -12,6 +12,8 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import re
+import numpy as np
 
 from ml.policy import SCORE_PROTOCOL, validate_artifact
 
@@ -33,6 +35,12 @@ def fit(rows, *, checkpoint_sha256, scores_sha256, domain, max_error=.01, min_co
     for field, expected in [('checkpoint_sha256', checkpoint_sha256), ('score_protocol', SCORE_PROTOCOL)]:
         if any(field in r for r in rows) and any(r.get(field) != expected for r in rows):
             raise ValueError('Validation score model/protocol provenance mismatch')
+    audio_hashes = [r.get('audio_sha256') for r in rows]
+    if any(value is not None for value in audio_hashes):
+        if any(not isinstance(value, str) or not re.fullmatch(r'[0-9a-f]{64}', value) for value in audio_hashes):
+            raise ValueError('Invalid validation audio digest provenance')
+        if len(set(audio_hashes)) != len(audio_hashes):
+            raise ValueError('Duplicate validation recordings inflate sample counts')
     human = [float(r['score']) for r in rows if r['label'] == 'human']
     ai = [float(r['score']) for r in rows if r['label'] == 'ai']
     counts = {label: sum(r['label'] == label for r in rows) for label in ('human','ai')}
@@ -41,8 +49,12 @@ def fit(rows, *, checkpoint_sha256, scores_sha256, domain, max_error=.01, min_co
         raise ValueError('Insufficient validation recordings or speakers per class')
     # Inclusive rules match production. Require genuine accepted examples on both
     # sides; fail rather than invent a viable threshold for inseparable scores.
-    lows = [s for s in sorted(set(human)) if sum(a <= s for a in ai)/len(ai) <= max_error]
-    highs = [s for s in sorted(set(ai)) if sum(h >= s for h in human)/len(human) <= max_error]
+    # Sorted search handles inclusive boundaries/ties in O(n log n), avoiding
+    # quadratic rescans on large evaluation corpora.
+    sorted_human, sorted_ai = np.sort(human), np.sort(ai)
+    human_candidates, ai_candidates = np.unique(sorted_human), np.unique(sorted_ai)
+    lows = human_candidates[np.searchsorted(sorted_ai, human_candidates, side='right') / len(ai) <= max_error].tolist()
+    highs = ai_candidates[(len(human)-np.searchsorted(sorted_human, ai_candidates, side='left')) / len(human) <= max_error].tolist()
     if not lows or not highs or max(lows) >= min(highs):
         raise ValueError('No separated thresholds meet the requested empirical error constraints')
     low, high = max(lows), min(highs)
@@ -53,6 +65,7 @@ def fit(rows, *, checkpoint_sha256, scores_sha256, domain, max_error=.01, min_co
                 'empirical_rates': {'human_as_ai': sum(h >= high for h in human)/len(human),
                                     'ai_as_human': sum(a <= low for a in ai)/len(ai),
                                     'coverage': sum(float(r['score']) <= low or float(r['score']) >= high for r in rows)/len(rows)},
+                'validation_audio_sha256': sorted(set(audio_hashes)) if all(value is not None for value in audio_hashes) else [],
                 'validation_id_hashes': {field: sorted({hashlib.sha256(r[field].encode()).hexdigest() for r in rows}) for field in ('speaker_id', 'source_id')},
                 'fit_constraints': {'max_empirical_error_per_class': max_error, 'min_recordings_per_class': min_count, 'min_speakers_per_class': min_speakers},
                 'limitations': ['Threshold selection reuses validation scores; validate the frozen policy on an untouched test set.',
