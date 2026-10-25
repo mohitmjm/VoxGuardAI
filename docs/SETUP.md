@@ -43,7 +43,7 @@ The Vite development proxy forwards `/api` to port 8000. For separate deployment
 
 ```sh
 python -m pip install pytest httpx
-python -m pytest tests -q
+python -m pytest tests research ml -q
 cd frontend
 npm run build
 npm test -- --run
@@ -52,3 +52,16 @@ npm test -- --run
 Model tests use a generated tone to exercise real checkpoint loading, determinism, finite outputs, and segment bounds, plus locally synthesized Flite speech through the complete API when FFmpeg includes the optional flite filter. That speech test is explicitly skipped on FFmpeg builds without Flite. It is **not** evidence of speech detection accuracy. Dataset evaluation must use properly labeled speech; see `research/` and `experiments/`.
 
 A missing checkpoint is a setup error; the backend must never manufacture a prediction. Keep the model checkpoint cache between runs. See `ml/` for the exact source, license, checksum, and downloader command if filenames change.
+
+## Real browser smoke verification
+
+Start the backend and frontend as above. Use an authorized human or synthetic speech recording; this is a mechanical integration check, not an accuracy benchmark. Install the browser test dependency outside the frontend package:
+
+```powershell
+npm install --prefix .cache/browser playwright-core@1.56.1
+$env:VOXGUARD_PLAYWRIGHT_MODULE = (Resolve-Path .cache/browser/node_modules/playwright-core).Path
+$env:VOXGUARD_CHROMIUM = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+node tests/browser.mjs "C:\path\to\authorized-recording.wav" http://localhost:5173 artifacts/browser-smoke.png
+```
+
+Set `VOXGUARD_CHROMIUM` to your actual Chrome/Chromium executable. The test runs real backend inference, validates the displayed score, downloads the JSON report, checks invalid-file handling and mobile layout, and saves a screenshot. Uploaded audio is not copied into the repository by the test; recordings and generated artifacts must remain untracked.

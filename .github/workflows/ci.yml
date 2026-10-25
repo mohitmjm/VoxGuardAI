@@ -24,10 +24,15 @@ jobs:
           python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r backend/requirements.txt -r ml/requirements.txt pytest httpx
           python -m pip check
+      - name: Restore immutable model checkpoint
+        uses: actions/cache@v4
+        with:
+          path: ml/checkpoints/AASIST.pth
+          key: aasist-${{ hashFiles('ml/constants.py') }}
       - name: Verify authentic model weights
         run: python -m ml.download_model
       - name: Test API, real inference and research tools
-        run: python -m pytest tests research -q
+        run: python -m pytest tests research ml -q
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 10

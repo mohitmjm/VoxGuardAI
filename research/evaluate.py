@@ -53,8 +53,9 @@ def audit(rows, held_out_generators=False):
     if held_out_generators:
         train = {r['generator'] for r in rows if r['split'] == 'train' and r['label'] == 'ai'}
         test = {r['generator'] for r in rows if r['split'] == 'test' and r['label'] == 'ai'}
-        if train & test:
-            errors.append('Test generators overlap training generators: ' + ', '.join(sorted(train & test)))
+        validation = {r['generator'] for r in rows if r['split'] == 'validation' and r['label'] == 'ai'}
+        if (train | validation) & test:
+            errors.append('Test generators overlap training/validation generators: ' + ', '.join(sorted((train | validation) & test)))
     if errors:
         raise ValueError('\n'.join(sorted(set(errors))))
     return {'recordings': len(rows), 'splits': {s: sum(r['split'] == s for r in rows) for s in ('train', 'validation', 'test')}, 'audit': 'passed', 'caveat': 'Metadata and byte hashes cannot detect all re-encodings or undisclosed pretrained training overlap.'}
@@ -66,14 +67,23 @@ def curves(y, scores):
         raise ValueError('Expected matching one-dimensional labels and finite [0,1] scores')
     if set(y.tolist()) != {0, 1}:
         raise ValueError('Both human and AI classes are required')
-    thresholds = np.r_[np.inf, np.sort(np.unique(scores))[::-1], -np.inf]
-    tpr = np.array([np.mean(scores[y == 1] >= t) for t in thresholds])
-    fpr = np.array([np.mean(scores[y == 0] >= t) for t in thresholds])
+    # A stable descending sort plus cumulative counts handles tied scores as one
+    # operating point. O(n log n), instead of rescanning n scores per threshold.
+    order = np.argsort(-scores, kind='stable')
+    sorted_scores, sorted_labels = scores[order], y[order]
+    endpoints = np.r_[np.flatnonzero(np.diff(sorted_scores) != 0), len(y) - 1]
+    positives = np.cumsum(sorted_labels == 1)
+    negatives = np.cumsum(sorted_labels == 0)
+    thresholds = np.r_[np.inf, sorted_scores[endpoints], -np.inf]
+    tpr = np.r_[0., positives[endpoints] / positives[-1], 1.]
+    fpr = np.r_[0., negatives[endpoints] / negatives[-1], 1.]
     return thresholds, tpr, fpr
 
 
 def metrics(y, scores, threshold):
     y, scores = np.asarray(y, dtype=int), np.asarray(scores, dtype=float)
+    if not math.isfinite(threshold) or not 0 <= threshold <= 1:
+        raise ValueError('Threshold must be finite and in [0,1]')
     if not np.all(np.isfinite(scores)) or not np.all((scores >= 0) & (scores <= 1)):
         raise ValueError('Scores must be finite and in [0,1]')
     _, tpr, fpr = curves(y, scores)
@@ -92,7 +102,9 @@ def metrics(y, scores, threshold):
     return {'accuracy': float(np.mean(pred == y)), 'precision': precision, 'recall': recall,
             'f1': 2 * precision * recall / (precision + recall) if precision + recall else 0.0,
             'auroc': float(np.sum(np.diff(fpr) * (tpr[:-1] + tpr[1:]) / 2)), 'eer': eer,
-            'false_positive_rate': fp / (fp + tn), 'n': len(y), 'tp': tp, 'fp': fp, 'fn': fn, 'tn': tn}
+            'false_positive_rate': fp / (fp + tn), 'false_negative_rate': fn / (fn + tp),
+            'confusion_matrix': {'labels': ['human', 'ai'], 'rows_true_columns_predicted': [[tn, fp], [fn, tp]]},
+            'n': len(y), 'tp': tp, 'fp': fp, 'fn': fn, 'tn': tn}
 
 
 def report(rows, threshold, bootstrap=1000, seed=42):
@@ -112,8 +124,22 @@ def report(rows, threshold, bootstrap=1000, seed=42):
         if len(np.unique(y[ids])) == 2:
             replicates.append(metrics(y[ids], scores[ids], threshold))
     result['bootstrap'] = {'unit': 'speaker', 'seed': seed, 'requested': bootstrap, 'valid_replicates': len(replicates), 'confidence': .95}
-    result['confidence_intervals'] = {k: np.quantile([r[k] for r in replicates], [.025, .975]).tolist() for k in ('accuracy','precision','recall','f1','auroc','eer','false_positive_rate')} if len(replicates) >= 100 else {}
+    result['confidence_intervals'] = {k: np.quantile([r[k] for r in replicates], [.025, .975]).tolist() for k in ('accuracy','precision','recall','f1','auroc','eer','false_positive_rate','false_negative_rate')} if len(replicates) >= 100 else {}
+    result['breakdowns'] = breakdowns(rows, threshold)
     return result
+
+
+def breakdowns(rows, threshold):
+    output = {}
+    for field in ('language', 'generator', 'dataset'):
+        if not all(field in r for r in rows):
+            continue
+        output[field] = {}
+        for value in sorted({r[field] for r in rows}):
+            subset = [r for r in rows if r[field] == value]
+            classes = {r['label'] for r in subset}
+            output[field][value] = {'n': len(subset), 'human': sum(r['label'] == 'human' for r in subset), 'ai': sum(r['label'] == 'ai' for r in subset), 'metrics': metrics([int(r['label'] == 'ai') for r in subset], [float(r['score']) for r in subset], threshold) if classes == {'human', 'ai'} else None}
+    return output
 
 
 def decode(path):
@@ -128,12 +154,14 @@ def decode(path):
 
 def score(rows):
     from ml.service import ModelService
+    from ml.constants import SHA256
+    from ml.policy import SCORE_PROTOCOL
     service = ModelService()
     for row in rows:
         audio = decode(row['audio_path'])
         start = time.perf_counter()
         prediction = service.analyze(audio, sample_rate=16000)
-        yield {**row, 'score': prediction['score'], 'latency_ms': (time.perf_counter()-start)*1000, 'duration_seconds': len(audio)/16000}
+        yield {**row, 'score': prediction['score'], 'latency_ms': (time.perf_counter()-start)*1000, 'duration_seconds': len(audio)/16000, 'checkpoint_sha256': SHA256, 'score_protocol': SCORE_PROTOCOL}
 
 
 def main():

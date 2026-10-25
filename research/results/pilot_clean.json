@@ -1,0 +1,87 @@
+{
+  "dataset": "Convenience pilot: three LibriSpeech excerpts and three classical Flite TTS utterances",
+  "sample_count": 6,
+  "class_counts": {
+    "human": 3,
+    "ai": 3
+  },
+  "model": "AASIST",
+  "checkpoint_sha256": "51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0",
+  "conditions": "English; three human readers, three Flite voices; no modern neural generators; clean recording; full-recording duration-weighted scores; no threshold",
+  "metrics": {
+    "auroc": 1.0,
+    "eer": 0.0
+  },
+  "latency_ms": {
+    "median": 712.5537720000921,
+    "p95": 1119.156851749949,
+    "first_call": 934.1269569999895
+  },
+  "threshold": null,
+  "decision_metrics": null,
+  "limitations": [
+    "Exploratory convenience pilot, not a benchmark or deployment validation set.",
+    "No decision threshold fitted; no binary accuracy, confidence, or generalization claim.",
+    "EER is a descriptive curve statistic, not an enabled operating threshold.",
+    "Very small sample size and synthesis/domain mismatch preclude reliable population estimates."
+  ],
+  "languages": [
+    "en"
+  ],
+  "generators": [
+    "flite-classical-tts"
+  ],
+  "scores_sha256": "b489f16628e203aa8d8fcf56a773c5aac639f124347ebe211ad76942b8c369b7",
+  "provenance_sha256": "3463e998530c5a198e8f2f2783e18906dcda5efb5d69c2be87e757caef7f0400",
+  "manifest_sha256": "1fd0979748e177ff1fdd878be617c63b5ee6d38b46d291bbec602cb8dcd6a286",
+  "hardware_performance": {
+    "model": {
+      "name": "AASIST",
+      "version": "a04c9863f63d44471dde8a6abcb3b082b07cd1d1",
+      "sample_rate": 16000,
+      "window_samples": 64600,
+      "license": "MIT (NAVER official repository)",
+      "source": "https://github.com/clovaai/aasist",
+      "checkpoint_sha256": "51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0",
+      "available": true,
+      "loaded": true,
+      "device": "cpu",
+      "inference_timeout_seconds": 120.0,
+      "training_dataset": "ASVspoof 2019 Logical Access",
+      "score_type": "uncalibrated spoof-class softmax score; not a probability of authenticity",
+      "thresholds": null,
+      "decision_policy": "abstain-until-validated",
+      "evaluated_languages": []
+    },
+    "os": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "python": "3.12.14",
+    "duration_seconds": 4.39,
+    "cold_inference_ms": 573.5529420003331,
+    "warm_inference_ms": 460.2583800001412,
+    "peak_process_rss_bytes": 495194112,
+    "cpu_count": 5,
+    "conditions": "Single recording; decoding excluded from timing; cold includes model load. Peak RSS includes Python and imports. Not an accuracy evaluation."
+  },
+  "score_summary": {
+    "human": {
+      "min": 0.20568357686966662,
+      "max": 0.5744797645456117,
+      "mean": 0.36224330406542865
+    },
+    "ai": {
+      "min": 0.959395986245542,
+      "max": 0.9999918480955122,
+      "mean": 0.986444364999889
+    }
+  },
+  "execution": {
+    "base_git_revision": "fe845f6df7f40bc2d8d60cc484306b90c5c766dd",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "python": "3.12.14",
+    "torch": "2.6.0+cpu",
+    "numpy": "1.26.4",
+    "inference_threads": 2,
+    "device": "cpu",
+    "score_script_sha256": "137cb1ea3e794c4be720b681832480bb2d73d82c40ab4147300894e93691060f"
+  }
+}

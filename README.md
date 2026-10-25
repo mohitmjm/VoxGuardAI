@@ -32,3 +32,7 @@ npm run build
 Research tools and experiment protocols live in `research/` and `experiments/`. No project benchmark results are claimed. Model source and licensing are documented in `ml/`.
 
 Optional validation-derived decisions: see [decision policy](docs/DECISION_POLICY.md). No policy or benchmark figures are bundled. For hosting without Docker see [deployment](docs/DEPLOYMENT.md). Run `.venv/bin/python scripts/preflight.py` to check FFmpeg, checkpoint integrity, and real inference.
+
+Research report dashboard: set `VOXGUARD_RESEARCH_REPORTS_PATH` to a trusted offline summary JSON (for example `research/results/pilot_dashboard.json`) before starting the backend. The dashboard always shows dataset, count, model and conditions; no metrics are generated from user uploads. The bundled six-recording pilot is not a benchmark. See `research/paper/manuscript.md` and `research/datasets/README.md`.
+
+Optional research speech embeddings are extracted separately; they are not a second validated detector. See `ml/README.md`. Windows can run `powershell -File scripts/run.ps1` after setup; a separate terminal runs `cd frontend; npm run dev`.

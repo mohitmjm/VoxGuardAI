@@ -31,3 +31,15 @@ def test_speaker_cluster_bootstrap():
     result=report(rows,.5,150)
     assert result['bootstrap']['valid_replicates'] >= 100
     assert result['confidence_intervals']['accuracy'] == [1.,1.]
+
+
+def test_sorted_curve_matches_bruteforce_with_ties():
+    import numpy as np
+    from research.evaluate import curves
+    labels=np.array([0,1,0,1,1,0,1])
+    scores=np.array([.2,.8,.5,.5,.9,.2,.1])
+    thresholds,tpr,fpr=curves(labels,scores)
+    reference=np.r_[np.inf,np.sort(np.unique(scores))[::-1],-np.inf]
+    assert np.array_equal(thresholds,reference)
+    assert np.allclose(tpr,[np.mean(scores[labels==1]>=t) for t in reference])
+    assert np.allclose(fpr,[np.mean(scores[labels==0]>=t) for t in reference])

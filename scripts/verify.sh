@@ -14,5 +14,5 @@ command -v ffmpeg >/dev/null
 command -v ffprobe >/dev/null
 "$voxguard_python" -m pip check
 "$voxguard_python" -m ml.download_model
-"$voxguard_python" -m pytest tests research -q
+"$voxguard_python" -m pytest tests research ml -q
 (cd frontend && npm test -- --run && npm run build)

@@ -1,0 +1,2 @@
+# Optional offline figure generation only; not required by inference or metric CLI.
+matplotlib>=3.8,<4

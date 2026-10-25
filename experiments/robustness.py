@@ -20,12 +20,14 @@ def noise(audio, snr_db, rng):
     return (mixed / max(1., np.max(np.abs(mixed)))).astype(np.float32)
 
 
-def compressed(audio, bitrate):
+def compressed(audio, bitrate, codec="mp3"):
+    if codec not in {"mp3", "aac"}:
+        raise ValueError("Supported research codecs are mp3 and aac")
     with tempfile.TemporaryDirectory(prefix='voxguard-research-') as folder:
-        path = Path(folder)/'compressed.mp3'
-        r = subprocess.run(['ffmpeg','-nostdin','-v','error','-f','f32le','-ar','16000','-ac','1','-i','pipe:0','-c:a','libmp3lame','-b:a',bitrate,str(path)], input=audio.astype('<f4').tobytes(),capture_output=True,timeout=45)
+        path = Path(folder)/('compressed.mp3' if codec == 'mp3' else 'compressed.m4a')
+        r = subprocess.run(['ffmpeg','-nostdin','-v','error','-f','f32le','-ar','16000','-ac','1','-i','pipe:0','-c:a',('libmp3lame' if codec == 'mp3' else 'aac'),'-b:a',bitrate,str(path)], input=audio.astype('<f4').tobytes(),capture_output=True,timeout=45)
         if r.returncode:
-            raise RuntimeError('MP3 research conversion failed')
+            raise RuntimeError('Research codec conversion failed')
         return decode(path)
 
 
@@ -36,14 +38,16 @@ def main():
     a=p.parse_args()
     rows=manifest(a.manifest); audit(rows)
     from ml.service import ModelService
+    from ml.constants import SHA256
+    from ml.policy import SCORE_PROTOCOL
     model=ModelService(); rng=np.random.default_rng(a.seed)
     with a.output.open('w',newline='') as f:
-        fields=list(rows[0])+['condition','score','latency_ms','seed']
+        fields=list(rows[0])+['condition','score','latency_ms','seed','checkpoint_sha256','score_protocol']
         w=csv.DictWriter(f,fieldnames=fields); w.writeheader()
         for row in rows:
             audio=decode(row['audio_path'])
-            for condition, transformed in [('clean',audio),('white_noise_20db',noise(audio,20,rng)),('white_noise_10db',noise(audio,10,rng)),('mp3_32k',compressed(audio,'32k')),('mp3_64k',compressed(audio,'64k'))]:
+            for condition, transformed in [('clean',audio),('white_noise_20db',noise(audio,20,rng)),('white_noise_10db',noise(audio,10,rng)),('mp3_32k',compressed(audio,'32k')),('mp3_64k',compressed(audio,'64k')),('aac_64k',compressed(audio,'64k','aac'))]:
                 start=time.perf_counter(); prediction=model.analyze(transformed,sample_rate=16000)
-                w.writerow({**row,'condition':condition,'score':prediction['score'],'latency_ms':1000*(time.perf_counter()-start),'seed':a.seed})
+                w.writerow({**row,'condition':condition,'score':prediction['score'],'latency_ms':1000*(time.perf_counter()-start),'seed':a.seed,'checkpoint_sha256':SHA256,'score_protocol':SCORE_PROTOCOL})
 
 if __name__=='__main__': main()

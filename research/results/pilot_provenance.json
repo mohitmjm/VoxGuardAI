@@ -1,0 +1,62 @@
+{
+  "dataset": "VoxGuard convenience pilot: LibriSpeech excerpts + local classical Flite TTS",
+  "n": 6,
+  "sources": [
+    {
+      "file": "5703-47212-0000.ogg",
+      "url": "https://raw.githubusercontent.com/librosa/librosa-data/38f4b06556fa0ff1acda5e677d8ba05d1bc0fff0/audio/5703-47212-0000.ogg",
+      "sha256": "a284612b46af0535f7e1873758c4387bb8369f6dbbe192ffdec1f171108f98dd",
+      "license": "CC-BY-4.0",
+      "attribution": "title = \"The Ashiel Mystery\"\nattribution = \"Marion Bryce (author), Garth Comira (reader)\"\ndescription = \"An excerpt from The Ashiel Mystery: A Detective Story, chapter XVI.\"\nlicense = \"CC-BY-4.0\"\ncorpus = \"LibriSpeech SLR12\"\nurl = \"https://www.openslr.org/12/\"\n",
+      "transformation": "None; original upstream Ogg excerpt. FFmpeg resampling occurs only during model scoring."
+    },
+    {
+      "file": "3436-172162-0000.ogg",
+      "url": "https://raw.githubusercontent.com/librosa/librosa-data/38f4b06556fa0ff1acda5e677d8ba05d1bc0fff0/audio/3436-172162-0000.ogg",
+      "sha256": "780e482b52f2c8a500356babf60178ce005449cc171a8537eb3ef2961eb3e855",
+      "license": "CC-BY-4.0",
+      "attribution": "title = \"The Age of Chivalry, chapter IX: The Adventure of the Cart\"\nattribution = \"Thomas Bulfinch (author), Anders Lankford (reader)\"\ndescription = \"\"\"\nAn excerpt from The Age of Chivalry, chapter IX: The Adventure of the Cart.\n\"\"\"\nlicense = \"CC-BY-4.0\"\ncorpus = \"LibriSpeech SLR12\"\nurl = \"https://www.openslr.org/12/\"\n",
+      "transformation": "None; original upstream Ogg excerpt. FFmpeg resampling occurs only during model scoring."
+    },
+    {
+      "file": "198-209-0000.ogg",
+      "url": "https://raw.githubusercontent.com/librosa/librosa-data/38f4b06556fa0ff1acda5e677d8ba05d1bc0fff0/audio/198-209-0000.ogg",
+      "sha256": "0473ba9613befa1026db5e254546f105aeffba8366b5468fc5e8d474d844ca1d",
+      "license": "CC-BY-4.0",
+      "attribution": "title = \"Sense and Sensibility, chapter 18\"\nattribution = \"Jane Austen (author), Heather Barnett (reader)\"\ndescription = \"An excerpt of Sense and Sensibility.\"\nlicense = \"CC-BY-4.0\"\ncorpus = \"LibriSpeech SLR12\"\nurl = \"https://www.openslr.org/12/\"\n",
+      "transformation": "None; original upstream Ogg excerpt. FFmpeg resampling occurs only during model scoring."
+    },
+    {
+      "file": "flite-slt.wav",
+      "sha256": "20141ad7a8701eb44c3799dd355ecece80b341828b9095a9a4742e64a408bbfc",
+      "generator": "FFmpeg flite filter; classical non-neural TTS",
+      "voice": "slt",
+      "text": "This recording was generated for a software evaluation of synthetic speech.",
+      "rights": "Original project-authored evaluation text, locally synthesized with installed Flite. Flite software license inspected at https://github.com/festvox/flite/blob/master/COPYING; no recording of a user is reused."
+    },
+    {
+      "file": "flite-awb.wav",
+      "sha256": "25cc2e27f699fdbfb86756c118e61b6ddb8209a2a1986ee81e175083b0ee6c32",
+      "generator": "FFmpeg flite filter; classical non-neural TTS",
+      "voice": "awb",
+      "text": "The quiet laboratory contains a microphone and an audio analysis computer.",
+      "rights": "Original project-authored evaluation text, locally synthesized with installed Flite. Flite software license inspected at https://github.com/festvox/flite/blob/master/COPYING; no recording of a user is reused."
+    },
+    {
+      "file": "flite-rms.wav",
+      "sha256": "44314ebf53f114aa3eaacd8837eb68c281a80c60fa356d179ad7f8b8db3a406e",
+      "generator": "FFmpeg flite filter; classical non-neural TTS",
+      "voice": "rms",
+      "text": "Please interpret every model score carefully because a small pilot cannot prove accuracy.",
+      "rights": "Original project-authored evaluation text, locally synthesized with installed Flite. Flite software license inspected at https://github.com/festvox/flite/blob/master/COPYING; no recording of a user is reused."
+    }
+  ],
+  "ffmpeg_version": "ffmpeg version 7.1.5-0+deb13u1 Copyright (c) 2000-2026 the FFmpeg developers",
+  "caveats": [
+    "Only three human excerpts and three synthesized utterances; not representative.",
+    "Human and synthetic source domains differ and may confound scores.",
+    "Flite is classical TTS, not modern neural synthesis or voice cloning.",
+    "LibriSpeech overlap with unknown pretrained data cannot be ruled out.",
+    "All six are test rows; no validation thresholds, probabilities, or reliable language/generator accuracy can be established."
+  ]
+}

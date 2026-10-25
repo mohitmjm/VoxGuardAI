@@ -30,6 +30,9 @@ def fit(rows, *, checkpoint_sha256, scores_sha256, domain, max_error=.01, min_co
         score = float(row['score'])
         if not math.isfinite(score) or not 0 <= score <= 1:
             raise ValueError('Scores must be finite and within [0, 1]')
+    for field, expected in [('checkpoint_sha256', checkpoint_sha256), ('score_protocol', SCORE_PROTOCOL)]:
+        if any(field in r for r in rows) and any(r.get(field) != expected for r in rows):
+            raise ValueError('Validation score model/protocol provenance mismatch')
     human = [float(r['score']) for r in rows if r['label'] == 'human']
     ai = [float(r['score']) for r in rows if r['label'] == 'ai']
     counts = {label: sum(r['label'] == label for r in rows) for label in ('human','ai')}
@@ -50,6 +53,7 @@ def fit(rows, *, checkpoint_sha256, scores_sha256, domain, max_error=.01, min_co
                 'empirical_rates': {'human_as_ai': sum(h >= high for h in human)/len(human),
                                     'ai_as_human': sum(a <= low for a in ai)/len(ai),
                                     'coverage': sum(float(r['score']) <= low or float(r['score']) >= high for r in rows)/len(rows)},
+                'validation_id_hashes': {field: sorted({hashlib.sha256(r[field].encode()).hexdigest() for r in rows}) for field in ('speaker_id', 'source_id')},
                 'fit_constraints': {'max_empirical_error_per_class': max_error, 'min_recordings_per_class': min_count, 'min_speakers_per_class': min_speakers},
                 'limitations': ['Threshold selection reuses validation scores; validate the frozen policy on an untouched test set.',
                                 'No statistical guarantee, probability calibration, or generalization to other languages/generators is established.']}

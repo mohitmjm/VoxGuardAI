@@ -1,0 +1,74 @@
+{
+  "reports": [
+    {
+      "dataset": "Convenience pilot: three LibriSpeech excerpts and three classical Flite TTS utterances",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; three human readers, three Flite voices; no modern neural generators; clean recording; full-recording duration-weighted scores; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=aac_64k; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=clean; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=mp3_32k; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=mp3_64k; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=white_noise_10db; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    },
+    {
+      "dataset": "Convenience pilot: LibriSpeech excerpts + classical Flite",
+      "sample_count": 6,
+      "model": "AASIST",
+      "metrics": {
+        "auroc": 1.0,
+        "eer": 0.0
+      },
+      "conditions": "English; n=6 paired recordings; condition=white_noise_20db; seed42; not modern neural TTS; no threshold; Exploratory six-recording convenience pilot only: no binary accuracy, calibration, representative benchmark or modern-generator robustness claim."
+    }
+  ]
+}

@@ -41,7 +41,7 @@ Metrics include accuracy, precision, recall, F1, AUROC, interpolated EER, false-
 | E | Proposed learned + acoustic fusion | Train-only normalization, validation-only selection |
 | F | Learned only, acoustic only, hybrid; augmentation off/on | Fixed splits, same seeds, parameter/cost accounting |
 
-`experiments.hybrid` trains a small experimental fusion head on precomputed frozen speech embeddings and LFCC summary features. It does not implement or claim a new backbone. Record exact encoder/version, layer, pooling, LFCC settings and provenance when producing the NPZ. No extractor, pretrained hybrid weights, fine-tuned detector, or evidence of improvement is supplied. Use at least three seeds for final comparisons and matched compute where feasible. Compression/noise harness outputs paired observations; evaluate each condition separately using the same frozen validation threshold. Do not mix repeated conditions as independent speakers.
+`experiments.hybrid` trains a small experimental fusion head on precomputed frozen speech embeddings and LFCC summary features. It does not implement or claim a new backbone. Record exact encoder/version, layer, pooling, LFCC settings and provenance when producing the NPZ. The optional `experiments.extract_features` pipeline provides frozen encoder/acoustic features when its separate model dependencies are installed; no pretrained hybrid weights, fine-tuned detector, or evidence of improvement is supplied. Use at least three seeds for final comparisons and matched compute where feasible. Compression/noise harness outputs paired observations; evaluate each condition separately using the same frozen validation threshold. Do not mix repeated conditions as independent speakers.
 
 ## Literature review outline
 
@@ -60,3 +60,31 @@ Verify full citations and claims against primary papers before submission: ASVsp
 9. Conclusion: evidence-supported findings and remaining work.
 
 Retain a result card per experiment: manifest/model/config hashes, run command, seed, hardware, runtime, metrics, confidence intervals, errors, and deviations. Do not fill tables with estimates or fabricate research results.
+
+## Completed research tools and manuscript
+
+The full, explicitly incomplete empirical manuscript is in `paper/manuscript.md`. It includes architecture diagrams, verified source references, result placeholders and outstanding experiments. This is a scientific draft, not evidence that a paper is ready for submission.
+
+`research.evaluate` now records checkpoint/score-protocol provenance, FNR and confusion matrices. Its language/generator/dataset breakdowns preserve one-class groups with `metrics: null` instead of inventing AUROC. Generator-held-out audits exclude both train and validation synthesis families from test.
+
+For a frozen abstaining policy, use the test-only report with identity leakage/provenance checks:
+
+```sh
+python -m research.report_policy data/test_scores.csv --policy policy.json --checkpoint-sha256 51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0 --output test_policy_metrics.json
+```
+
+Current policy fitting records validation speaker/source hashes. Refitting an old policy is required before this strict report. It reports the full 2×3 confusion matrix, unconditional class errors, per-class abstention, coverage and accepted-only accuracy with explicit denominators. A low false-negative rate that excludes abstentions is not full recall; report both.
+
+For a small convenience pilot without defensible thresholds, `research.pilot_report` reports only rank-based AUROC/EER and measured latency. No decision accuracy is computed or silently defaulted to 0.5. The pilot is not deployment calibration. Plot existing measured scalar results with:
+
+```sh
+python -m research.plot_results actual_metrics.json --title "Dataset, sample count and conditions" --output actual_metrics.svg
+```
+
+## Actual bounded pilot (not a benchmark)
+
+`results/pilot_clean.json` and `results/pilot_robustness.json` record genuine AASIST inference on three licensed LibriSpeech excerpts and three classical Flite utterances. AUROC1.0/EER0.0 on this tiny, domain-confounded English convenience sample does not establish modern neural-TTS accuracy or robustness. Six paired conditions produce36 observations from six recordings, not36 independent samples. No validation thresholds were fitted. See `datasets/README.md` for reproduction and per-file rights. Metrics/figures can be regenerated from the ignored raw scores; recordings are not committed.
+
+For the application dashboard, `results/pilot_dashboard.json` contains only sanitized API fields (dataset, sample_count, model, conditions, metrics) and embeds the small-pilot limitation in every condition string. Set `VOXGUARD_RESEARCH_REPORTS_PATH` to its absolute path and restart the backend. Full provenance result cards remain separate; do not point the API at a raw rich result card. `research.pilot_report --dashboard-output dashboard.json` optionally creates a compatible one-report collection alongside its full result JSON.
+
+`results/pilot_scores.csv` preserves the six measured score rows with portable recording paths. Original run hashes in result cards refer to the original absolute-path score file retained under ignored artifacts; timings are run-specific. No audio is committed.
