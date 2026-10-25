@@ -3,7 +3,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -r
 WORKDIR /app
 COPY backend/requirements.txt backend/requirements.txt
 COPY ml/requirements.txt ml/requirements.txt
-RUN pip install --no-cache-dir 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu && pip install --no-cache-dir -r backend/requirements.txt -r ml/requirements.txt
+RUN pip install --no-cache-dir torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu && pip install --no-cache-dir -r backend/requirements.txt -r ml/requirements.txt
 COPY ml ml
 COPY backend backend
 RUN python -m ml.download_model

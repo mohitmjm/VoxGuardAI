@@ -6,12 +6,12 @@ Keep both components in the same GitHub repository. Deploy the frontend and back
 
 Choose a provider that supports a persistent Python process, PyTorch CPU wheels, installation of FFmpeg **and** FFprobe, writable temporary storage, HTTPS, and downloading the official model checkpoint. A generic short-lived function host is unsuitable without separately verifying its dependency size, execution duration, and memory limits. Vercel is used for the frontend in this configuration.
 
-Set the repository root as the working directory, and Python 3.11+ (3.12 was locally tested). Install FFmpeg with the host's supported system-package mechanism. If it cannot provide both binaries, select another host. Docker is optional.
+Set the repository root as the working directory, and Python 3.11 or 3.12 (3.12 was locally tested). Install FFmpeg with the host's supported system-package mechanism. If it cannot provide both binaries, select another host. Docker is optional.
 
 Build commands:
 
 ```sh
-python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r backend/requirements.txt -r ml/requirements.txt
 python -m ml.download_model
 python -m pip check

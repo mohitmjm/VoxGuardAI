@@ -3,7 +3,7 @@ import hashlib
 import tempfile
 import urllib.request
 from pathlib import Path
-from ml.service import ROOT, SHA256, COMMIT
+from ml.constants import ROOT, SHA256, COMMIT
 
 def main():
     url = f'https://raw.githubusercontent.com/clovaai/aasist/{COMMIT}/models/weights/AASIST.pth'

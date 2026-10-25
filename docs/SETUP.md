@@ -1,13 +1,13 @@
 # Local setup
 
-Prerequisites: Python 3.11+, Node.js 20.19+ (or 22.12+), and FFmpeg with ffprobe on PATH. No API key, database, or paid service is required. Run commands from the repository root.
+Prerequisites: Python 3.11 or 3.12, Node.js 20.19+ (or 22.12+), and FFmpeg with ffprobe on PATH. No API key, database, or paid service is required. Run commands from the repository root.
 
 ## Linux / macOS
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
 python -m pip install -r backend/requirements.txt
 python -m pip install -r ml/requirements.txt
 python -m ml.download_model
@@ -28,7 +28,7 @@ Install Python, Node.js, and an FFmpeg build; verify `ffmpeg -version` and `ffpr
 
 ```powershell
 py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu torch
+.\.venv\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
 .\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
 .\.venv\Scripts\python.exe -m pip install -r ml/requirements.txt
 .\.venv\Scripts\python.exe -m ml.download_model

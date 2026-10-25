@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ffmpeg
-          python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r backend/requirements.txt -r ml/requirements.txt pytest httpx
           python -m pip check
       - name: Verify authentic model weights

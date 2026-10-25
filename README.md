@@ -4,11 +4,11 @@ Research-oriented detection of AI-generated speech using genuine pretrained AASI
 
 ## Local development
 
-Python 3.11+, Node 20+, and FFmpeg/ffprobe must be available.
+Python 3.11 or 3.12, Node 20+, and FFmpeg/ffprobe must be available.
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 .venv/bin/python -m pip install -r backend/requirements.txt -r ml/requirements.txt pytest httpx scikit-learn scipy
 .venv/bin/python -m ml.download_model
 .venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
