@@ -4,7 +4,7 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     environment:
-      CORS_ORIGINS: http://localhost:5173
+      VOXGUARD_CORS_ORIGINS: http://localhost:5173
       VOXGUARD_DEVICE: cpu
     security_opt:
       - no-new-privileges:true

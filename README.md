@@ -8,8 +8,9 @@ Python 3.11+, Node 20+, and FFmpeg/ffprobe must be available.
 
 ```sh
 python -m venv .venv
-.venv/bin/python -m pip install -r backend/requirements.txt
-.venv/bin/python -m ml.download
+.venv/bin/python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/python -m pip install -r backend/requirements.txt -r ml/requirements.txt pytest httpx scikit-learn scipy
+.venv/bin/python -m ml.download_model
 .venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
 # In another terminal
 cd frontend
@@ -22,7 +23,7 @@ On Windows use `.venv\Scripts\python.exe` instead of `.venv/bin/python`. Install
 ## Validation
 
 ```sh
-.venv/bin/python -m pytest tests -q
+.venv/bin/python -m pytest tests research -q
 cd frontend
 npm test -- --run
 npm run build
