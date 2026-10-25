@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      CORS_ORIGINS: http://localhost:5173
+      VOXGUARD_DEVICE: cpu
+    security_opt:
+      - no-new-privileges:true
+  frontend:
+    image: node:22-alpine
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend_modules:/app/frontend/node_modules
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_PROXY_TARGET: http://backend:8000
+    ports:
+      - "127.0.0.1:5173:5173"
+volumes:
+  frontend_modules:
