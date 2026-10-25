@@ -62,7 +62,7 @@ def evaluate(rows, artifact, expected_checkpoint_sha256):
             'accuracy_on_accepted': correct / accepted if accepted else None,
             'accuracy_counting_abstention_as_incorrect': correct / len(rows),
             'precision_on_ai_decisions': precision, 'recall_counting_abstention_as_miss': recall,
-            'f1_counting_abstention_as_miss': 2*precision*recall/(precision+recall) if precision is not None and precision+recall else None,
+            'f1_counting_abstention_as_miss': 2*precision*recall/(precision+recall) if precision is not None and precision+recall else (0.0 if precision is not None else None),
             'false_positive_rate': fp/human, 'false_negative_rate_excluding_abstention': fn/ai,
             'human_abstention_rate': matrix[0][2]/human, 'ai_abstention_rate': matrix[1][2]/ai,
             'auroc': float(np.sum(np.diff(fpr)*(tpr[:-1]+tpr[1:])/2)), 'eer': eer,

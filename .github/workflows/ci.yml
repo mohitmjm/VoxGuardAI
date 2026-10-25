@@ -32,7 +32,7 @@ jobs:
       - name: Verify authentic model weights
         run: python -m ml.download_model
       - name: Test API, real inference and research tools
-        run: python -m pytest tests research ml -q
+        run: python -m pytest tests research ml experiments -q
   frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 10

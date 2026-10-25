@@ -170,9 +170,10 @@ def score(rows):
         audio = decode(row['audio_path'])
         start = time.perf_counter()
         prediction = service.analyze(audio, sample_rate=16000)
+        latency_ms = (time.perf_counter()-start)*1000
         with Path(row['audio_path']).open('rb') as handle:
             audio_digest = hashlib.file_digest(handle, 'sha256').hexdigest()
-        yield {**row, 'audio_sha256': audio_digest, 'score': prediction['score'], 'latency_ms': (time.perf_counter()-start)*1000, 'duration_seconds': len(audio)/16000, 'checkpoint_sha256': SHA256, 'score_protocol': SCORE_PROTOCOL}
+        yield {**row, 'recording_id': row.get('recording_id') or 'sha256:'+audio_digest, 'audio_sha256': audio_digest, 'score': prediction['score'], 'latency_ms': latency_ms, 'duration_seconds': len(audio)/16000, 'checkpoint_sha256': SHA256, 'score_protocol': SCORE_PROTOCOL}
 
 
 def main():

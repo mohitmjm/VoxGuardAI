@@ -42,6 +42,7 @@ class Wav2Vec2Features:
             dl_kwargs={'model_dir': str(self.cache), 'weights_only': True, 'progress': False}
         ).to(device).eval()
         self.digest = _digest(path)
+        self.checkpoint_size_bytes = path.stat().st_size
         if self.digest != WAV2VEC2_SHA256:
             raise RuntimeError('Official Wav2Vec2 download differs from the recorded checkpoint digest.')
 
@@ -49,7 +50,8 @@ class Wav2Vec2Features:
         return {'name': 'TorchAudio WAV2VEC2_BASE', 'torch_version': torch.__version__,
                 'torchaudio_version': '2.6.0', 'training_data': 'LibriSpeech 960h (English)',
                 'source': 'https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960.pth',
-                'checkpoint_sha256': self.digest,
+                'checkpoint_sha256': self.digest, 'checkpoint_size_bytes': self.checkpoint_size_bytes,
+                'parameter_count': sum(parameter.numel() for parameter in self.model.parameters()),
                 'digest_status': 'enforced recorded official HTTPS artifact digest; not an author-signed checksum',
                 'layer': 12, 'sample_rate': 16000, 'window_samples': 64000,
                 'pooling': 'duration-weighted window temporal mean and population std',

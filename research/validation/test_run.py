@@ -107,3 +107,65 @@ def test_sorted_threshold_search_matches_inclusive_reference():
     lows=[s for s in sorted(set(human)) if sum(a<=s for a in ai)/len(ai)<=.34]
     highs=[s for s in sorted(set(ai)) if sum(h>=s for h in human)/len(human)<=.34]
     assert policy['human_max']==max(lows) and policy['ai_min']==min(highs)
+
+
+def test_protocol_is_frozen_before_model_calls(tmp_path,monkeypatch):
+    import json
+    manifest,_=write_manifest(tmp_path,('test',))
+    target=tmp_path/'run'
+    def verified_score(rows):
+        protocol=json.loads((target/'protocol.json').read_text())
+        assert protocol['frozen_before_inference'] is True
+        assert len(protocol['recordings'])==4
+        assert all(len(r['audio_sha256'])==64 for r in protocol['recordings'])
+        return scores(rows)
+    monkeypatch.setattr(pipeline,'score',verified_score)
+    result=pipeline.run(manifest,target,dataset='fixture',conditions='fixture')
+    assert len(result['protocol_sha256'])==64
+    assert result['uncertainty']['status']=='insufficient_clusters'
+
+
+def test_invalid_bootstrap_rejected_before_inference(tmp_path,monkeypatch):
+    manifest,_=write_manifest(tmp_path,('test',))
+    monkeypatch.setattr(pipeline,'score',lambda rows:pytest.fail('must not score invalid config'))
+    with pytest.raises(ValueError,match='replicates'):
+        pipeline.run(manifest,tmp_path/'run',dataset='fixture',conditions='fixture',bootstrap_replicates=0)
+
+
+def test_manifest_mutation_after_freeze_is_rejected(tmp_path,monkeypatch):
+    manifest,_=write_manifest(tmp_path,('test',))
+    def mutate(rows):
+        manifest.write_text(manifest.read_text()+'\n')
+        return scores(rows)
+    monkeypatch.setattr(pipeline,'score',mutate)
+    with pytest.raises(ValueError,match='Manifest changed'):
+        pipeline.run(manifest,tmp_path/'run',dataset='fixture',conditions='fixture')
+    assert not (tmp_path/'run'/'summary.json').exists()
+
+
+def test_explicit_duplicate_recording_ids_rejected(tmp_path):
+    manifest,_=write_manifest(tmp_path,('test',))
+    rows=pipeline.manifest(manifest)
+    for row in rows:row['recording_id']='same-original-recording'
+    with pytest.raises(ValueError,match='Repeated recording'):
+        pipeline.audit_recordings(rows)
+
+
+@pytest.mark.parametrize('mutation',['recording_id','audio_sha256','label','count','protocol'])
+def test_scored_identity_and_frozen_protocol_cannot_change(tmp_path,monkeypatch,mutation):
+    import json
+    manifest,_=write_manifest(tmp_path,('test',));target=tmp_path/'run'
+    def changed(rows):
+        result=list(scores(rows))
+        if mutation=='count':return result[:-1]
+        if mutation=='protocol':
+            path=target/'protocol.json'
+            content=json.loads(path.read_text());content['seed']=999
+            path.write_text(json.dumps(content))
+        else:result[0][mutation]='different'
+        return result
+    monkeypatch.setattr(pipeline,'score',changed)
+    with pytest.raises(ValueError,match='frozen protocol|Protocol changed'):
+        pipeline.run(manifest,target,dataset='fixture',conditions='fixture')
+    assert (target/'failure.json').exists()
+    assert not (target/'summary.json').exists()

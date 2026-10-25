@@ -100,3 +100,50 @@ Numerical fixtures test policy boundaries, split separation, duplicate/content
 leakage, unknown generator rejection and failure preservation; they are never
 presented as measured detector accuracy. Authorized representative modern,
 unseen-generator, multilingual and hybrid-comparison results remain pending data.
+
+## Prospective uncertainty and frozen protocol (dataset sprint)
+
+This sprint acquired **zero new evaluation recordings** because the requested
+MLAAD-tiny/In-The-Wild Hugging Face and Zenodo14498691 sources were blocked.
+It deliberately did not rerun the six-recording pilot. No new detector metrics,
+validation policy, unseen-generator result or hybrid improvement is asserted.
+
+Before inference, the runner now writes an exclusive `protocol.json` binding the
+complete manifest, each recording's content hash, supplied identities/labels and
+partitions, model/score identity, seed, threshold objective and uncertainty
+configuration. Its digest is included in the summary. Changed input files or a
+changed manifest invalidate a run; a frozen protocol still cannot prove that the
+custodian supplied correct metadata or representative data.
+
+For real future corpora, `--bootstrap-replicates 1000` (default) adds 95%
+percentile intervals using connected components of **both** speaker and source
+identities. This avoids treating one speaker, derived source utterances or
+paired codec observations as independent samples. At least10 components and100
+valid replicates per metric are required; otherwise intervals remain unavailable.
+A ten-component cutoff is a pragmatic minimum, not a statistical guarantee.
+Single-class draws and undefined precision/accepted accuracy are excluded only
+from their respective metric, with valid replicate counts reported. Perfect or
+rare-error rankings can give degenerate/unstable intervals even when an interval
+is computable. These intervals do not repair selection bias or pretraining
+contamination. The six-clip pilot would receive **no intervals** under this rule.
+
+When a reviewed frozen validation policy exists, intervals include coverage,
+abstention-sensitive recall/F1, FPR/FNR and accepted-only accuracy with explicitly
+named denominators. No thresholds are re-fit during resampling or on degraded
+test recordings. Per-generator ranking references the same supplied human
+recordings for each synthetic family: these comparisons are dependent, not
+independent experiments. Pretrained exposure remains `unknown`; naming a
+modern generator does not establish that its family was unseen by AASIST.
+
+The numerical-fixture tests exercise clustering, mutation detection, bootstrap
+reproducibility, ties/undefined metrics and model-call protocol ordering. They
+are software/statistical checks and are never reported as model evaluation.
+
+The frozen protocol preserves an explicit `recording_id` when provided. Otherwise
+`sha256:<audio-byte-digest>` is a derived byte identity, **not** an invented
+speaker/source identifier or an assertion of original dataset provenance.
+Repeated recording IDs/content are rejected. Scored row count, identities,
+labels and partition metadata must still match the frozen protocol; editing the
+protocol during inference invalidates the run rather than producing a success
+summary. This also supplies an exact identity/hash join for separately extracted
+hybrid features and baseline score CSVs.
