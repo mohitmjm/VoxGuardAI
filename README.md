@@ -30,3 +30,5 @@ npm run build
 ```
 
 Research tools and experiment protocols live in `research/` and `experiments/`. No project benchmark results are claimed. Model source and licensing are documented in `ml/`.
+
+Optional validation-derived decisions: see [decision policy](docs/DECISION_POLICY.md). No policy or benchmark figures are bundled. For hosting without Docker see [deployment](docs/DEPLOYMENT.md). Run `.venv/bin/python scripts/preflight.py` to check FFmpeg, checkpoint integrity, and real inference.

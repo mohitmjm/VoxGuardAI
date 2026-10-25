@@ -21,3 +21,30 @@ describe('upload workspace',()=>{
  });
  it('shows backend failure without producing a prediction',async()=>{const {container}=setup();vi.mocked(fetch).mockResolvedValueOnce({ok:false,json:async()=>({detail:'Model checkpoint is unavailable'})} as Response);fireEvent.change(container.querySelector('input')!,{target:{files:[new File(['audio'],'voice.wav')]}});fireEvent.click(screen.getByRole('button',{name:/Analyze recording/}));expect((await screen.findByRole('alert')).textContent).toContain('Model checkpoint is unavailable');expect(screen.queryByText('Uncertain')).toBeNull();});
 });
+
+describe('report interaction and cancellation',()=>{
+ const response={classification:'uncertain',score:.7,segments:[{start:0,end:2,score:.7},{start:2,end:4,score:.6}],model:{name:'AASIST'},limitations:['Not calibrated'],duration_seconds:4,sample_rate:16000,latency_ms:200,processing:{original_format:'wav',channels:2,sample_rate:44100,output_sample_rate:16000}};
+ function select(container:HTMLElement){fireEvent.change(container.querySelector('input')!,{target:{files:[new File(['audio'],'voice.wav')]}});fireEvent.click(screen.getByRole('button',{name:/Analyze recording/}));}
+ it('seeks segments, follows playback, displays processing and exports report',async()=>{
+  const {container}=setup();vi.mocked(fetch).mockResolvedValueOnce({ok:true,json:async()=>response} as Response);
+  const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+  select(container);await screen.findByText('Uncertain');
+  fireEvent.click(screen.getByRole('button',{name:/Seek to segment 2/}));
+  const player=screen.getByLabelText('Uploaded recording playback') as HTMLAudioElement;
+  expect(player.currentTime).toBe(2);expect(screen.getByText('Playback position: 2.0s')).toBeTruthy();
+  player.currentTime=2.8;fireEvent.timeUpdate(player);expect(screen.getByText('Playback position: 2.8s')).toBeTruthy();
+  expect(screen.getByText('44100')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Download analysis JSON'}));
+  expect(URL.createObjectURL).toHaveBeenLastCalledWith(expect.any(Blob));expect(click).toHaveBeenCalledTimes(1);click.mockRestore();
+ });
+ it('cancels upload and ignores a late server result',async()=>{
+  const {container}=setup();let resolve!:(value:Response)=>void;
+  vi.mocked(fetch).mockImplementationOnce(()=>new Promise<Response>(done=>{resolve=done;}));
+  select(container);fireEvent.click(screen.getByRole('button',{name:'Cancel analysis'}));
+  const call=vi.mocked(fetch).mock.calls.at(-1)!;
+  expect((call[1]?.signal as AbortSignal).aborted).toBe(true);
+  resolve({ok:true,json:async()=>response} as Response);
+  await waitFor(()=>expect(screen.getByRole('alert').textContent).toContain('cancelled locally'));
+  expect(screen.queryByText('Uncertain')).toBeNull();expect((screen.getByRole('button',{name:/Analyze recording/}) as HTMLButtonElement).disabled).toBe(false);
+ });
+});

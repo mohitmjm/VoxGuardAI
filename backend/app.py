@@ -13,6 +13,8 @@ import tempfile
 import threading
 import time
 
+from backend.schemas import AnalysisResult
+
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -139,7 +141,7 @@ def analyze_path(path, suffix, output):
     return {**result, "duration_seconds": len(samples) / 16000, "sample_rate": 16000, "processing": processing, "latency_ms": round((time.perf_counter() - started) * 1000, 2)}
 
 
-@app.post("/api/analyze")
+@app.post("/api/analyze", response_model=AnalysisResult)
 async def analyze(file: UploadFile = File(...)):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in FORMATS:

@@ -9,6 +9,7 @@ import numpy as np
 import torch
 
 from ml.vendor.aasist import Model
+from ml.policy import load_policy
 
 ROOT = Path(__file__).resolve().parent
 SHA256 = '51d2d9cf0738172f61e2a384ec50a54a55363240f67c971ed55a92435bc1a1c0'
@@ -24,6 +25,10 @@ class ModelService:
         self.device = os.getenv('VOXGUARD_DEVICE', 'cpu')
         self._model = None
         self._lock = threading.Lock()
+        try:
+            self.policy = load_policy(expected_checkpoint_sha256=SHA256)
+        except ValueError as exc:
+            raise ModelUnavailable("Configured decision policy is invalid; review its model and validation provenance.") from exc
         torch.set_num_threads(max(1, int(os.getenv('VOXGUARD_TORCH_THREADS', '2'))))
 
     def info(self):
@@ -35,7 +40,9 @@ class ModelService:
             'loaded': self._model is not None, 'device': self.device,
             'training_dataset': 'ASVspoof 2019 Logical Access',
             'score_type': 'uncalibrated spoof-class softmax score; not a probability of authenticity',
-            'thresholds': None, 'evaluated_languages': [],
+            'thresholds': self.policy.metadata() if self.policy else None,
+            'decision_policy': 'validation-derived opt-in' if self.policy else 'abstain-until-validated',
+            'evaluated_languages': [],
         }
 
     def _load(self):
@@ -72,9 +79,10 @@ class ModelService:
                 score = float(torch.softmax(logits, dim=-1)[0, 0].cpu())
                 segments.append({'start': start / 16000, 'end': end / 16000, 'score': score})
         score = float(np.average([s['score'] for s in segments], weights=[s['end']-s['start'] for s in segments]))
-        return {'classification': 'uncertain', 'score': score, 'segments': segments,
+        classification = self.policy.classify(score) if self.policy else 'uncertain'
+        return {'classification': classification, 'score': score, 'segments': segments,
                 'model': self.info(), 'limitations': [
-                    'No deployment validation thresholds are available; classification remains Uncertain.',
+                    ('Opt-in validation-derived thresholds apply only to the declared research domain; uploaded audio domain is not automatically verified.' if self.policy else 'No deployment validation thresholds are available; classification remains Uncertain.'),
                     'Scores are uncalibrated and cannot prove recording authenticity.',
                     'Modern unseen generators, Hindi and Marathi have not been evaluated.',
                     'Window scores do not locate exact synthetic edits; short windows are repeat-padded.',
