@@ -1,0 +1,4 @@
+# Optional only; first install ml/requirements.txt and the matching CPU wheel:
+# python -m pip install torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+# Official Wav2Vec2 checkpoint is ~360 MB and is downloaded on first extraction.
+torchaudio==2.6.0

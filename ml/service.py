@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import threading
+import time
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +22,12 @@ class ModelService:
         self.path = Path(os.getenv('VOXGUARD_CHECKPOINT', str(ROOT / 'checkpoints/AASIST.pth')))
         self.device = os.getenv('VOXGUARD_DEVICE', 'cpu')
         self._model = None
+        try:
+            self.timeout_seconds = float(os.getenv('VOXGUARD_INFERENCE_TIMEOUT_SECONDS', '120'))
+        except ValueError as exc:
+            raise ModelUnavailable('Inference timeout must be a positive finite number.') from exc
+        if not np.isfinite(self.timeout_seconds) or self.timeout_seconds <= 0:
+            raise ModelUnavailable('Inference timeout must be a positive finite number.')
         self._lock = threading.Lock()
         try:
             self.policy = load_policy(expected_checkpoint_sha256=SHA256)
@@ -35,6 +42,7 @@ class ModelService:
             'source': 'https://github.com/clovaai/aasist',
             'checkpoint_sha256': SHA256, 'available': self.path.is_file(),
             'loaded': self._model is not None, 'device': self.device,
+            'inference_timeout_seconds': self.timeout_seconds,
             'training_dataset': 'ASVspoof 2019 Logical Access',
             'score_type': 'uncalibrated spoof-class softmax score; not a probability of authenticity',
             'thresholds': self.policy.metadata() if self.policy else None,
@@ -62,11 +70,14 @@ class ModelService:
         if sample_rate != 16000 or samples.ndim != 1 or not samples.size or not np.isfinite(samples).all():
             raise ValueError('Expected nonempty finite mono 16 kHz samples.')
         segments = []
+        deadline = time.monotonic() + self.timeout_seconds
         # Upstream repeats short utterances to exactly 64600 samples. Long recordings
         # use contiguous windows; the final short tail follows that same rule.
         with self._lock, torch.inference_mode():
             self._load()
             for start in range(0, len(samples), WINDOW):
+                if time.monotonic() >= deadline:
+                    raise TimeoutError('Inference exceeded the configured processing deadline.')
                 end = min(start + WINDOW, len(samples))
                 window = samples[start:end]
                 if len(window) < WINDOW:
@@ -74,6 +85,8 @@ class ModelService:
                 tensor = torch.from_numpy(window.copy()).unsqueeze(0).to(self.device)
                 _, logits = self._model(tensor)
                 score = float(torch.softmax(logits, dim=-1)[0, 0].cpu())
+                if time.monotonic() >= deadline:
+                    raise TimeoutError('Inference exceeded the configured processing deadline.')
                 segments.append({'start': start / 16000, 'end': end / 16000, 'score': score})
         score = float(np.average([s['score'] for s in segments], weights=[s['end']-s['start'] for s in segments]))
         classification = self.policy.classify(score) if self.policy else 'uncertain'

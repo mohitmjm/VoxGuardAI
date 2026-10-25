@@ -117,3 +117,23 @@ def test_busy_request(client, wav_bytes):
 
 def test_missing_multipart_field(client):
     assert client.post('/api/analyze', data={}).status_code == 422
+
+
+def test_inference_timeout_releases_gate_and_deletes_upload(client, wav_bytes, monkeypatch):
+    original = tempfile.TemporaryDirectory
+    created = []
+    def tracked(*args, **kwargs):
+        context = original(*args, **kwargs)
+        created.append(Path(context.name))
+        return context
+    class TimedOutModel(RecordingModel):
+        def analyze(self, samples, sample_rate=16000):
+            raise TimeoutError('private diagnostic')
+    monkeypatch.setattr(api, '_model', TimedOutModel())
+    monkeypatch.setattr(api.tempfile, 'TemporaryDirectory', tracked)
+    response = upload(client, 'tone.wav', wav_bytes())
+    assert response.status_code == 504
+    assert 'private diagnostic' not in response.text
+    assert created and all(not p.exists() for p in created)
+    assert api._gate.acquire(blocking=False), 'Timed-out request leaked inference gate'
+    api._gate.release()

@@ -14,6 +14,7 @@ import threading
 import time
 
 from backend.schemas import AnalysisResult
+from backend.reports import research_reports
 
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -93,6 +94,11 @@ def info():
     return model_info()
 
 
+@app.get("/api/research/results")
+def evaluation_results():
+    return research_reports()
+
+
 def decode_audio(path: Path, suffix: str, output: Path):
     """Use content probing and bounded decoding without a shell or network protocols."""
     try:
@@ -133,6 +139,8 @@ def analyze_path(path, suffix, output):
     started = time.perf_counter()
     try:
         result = get_model().analyze(samples, sample_rate=16000)
+    except TimeoutError:
+        raise HTTPException(504, "Analysis exceeded the configured processing time. Try a shorter recording.") from None
     except Exception as exc:
         if type(exc).__name__ == "ModelUnavailable" or isinstance(exc, ImportError):
             raise HTTPException(503, "Detection model unavailable. Follow the model setup instructions.") from None
