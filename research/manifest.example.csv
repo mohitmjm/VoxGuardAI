@@ -1,0 +1,6 @@
+audio_path,label,speaker_id,source_id,generator,split,language
+consented/train_human.wav,human,speaker_train_01,source_train_01,microphone,train,en
+consented/validation_human.wav,human,speaker_val_01,source_val_01,microphone,validation,en
+consented/validation_synthetic.wav,ai,speaker_val_02,source_val_02,generator_A,validation,en
+consented/test_human.wav,human,speaker_test_01,source_test_01,microphone,test,en
+consented/test_synthetic.wav,ai,speaker_test_02,source_test_02,generator_B,test,en
