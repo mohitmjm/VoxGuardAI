@@ -62,3 +62,33 @@ This variable is embedded at build time. Redeploy the frontend after changing it
 5. Confirm the provider's no-sleep policy, restart behavior and resource limits. Check inference after a backend restart; live processes and in-memory model state do not survive restarts.
 
 Do not claim benchmark accuracy from deployment smoke tests. Without validated thresholds, Uncertain is the intended scientific result; real model scores are still returned. Hindi, Marathi and modern generator performance remain unevaluated. This document supplies instructions only: it does not deploy a service or establish public availability.
+
+
+## Suggested hosted setup
+
+Use Vercel for `frontend/` and a **Render native Python Web Service** for inference. Choose a non-sleeping instance with at least 2 GB RAM; more memory provides headroom. Actual cloud smoke runs consumed approximately 0.5 GB process RSS before concurrent traffic/installation overhead. Do not choose a plan solely from that single-run measurement. This is a recommendation, not a service created or a confirmed provider price.
+
+For Render, connect `mohitmjm/VoxGuardAI`, choose branch `feature/voxguard-ai`, repository root, and the Python runtime. Select a supported Python 3.11/3.12 patch release through the provider's Python-version setting. Set:
+
+- Build command: `bash scripts/render-build.sh`
+- Start command: `python -m uvicorn backend.app:app --host 0.0.0.0 --port $PORT --workers 1`
+- Health path: `/api/health`
+- `VOXGUARD_DEVICE=cpu`
+- `VOXGUARD_CORS_ORIGINS=https://YOUR-FRONTEND.vercel.app`
+
+The build explicitly verifies FFmpeg and FFprobe. Their availability in the provider's current native image has not been verified from this workspace because Render documentation access is blocked. If either is missing, provision them through the provider-supported mechanism or use an Ubuntu VPS with the `ffmpeg` system package. No TLS, artifact or package verification should be disabled. No backend service or paid instance has been created.
+
+For Vercel, import the same repository, choose `feature/voxguard-ai`, and set Root Directory to `frontend`. `frontend/vercel.json` fixes the Vite install/build/output settings. Once the backend has its real HTTPS URL, set `VITE_API_BASE_URL` in Vercel and redeploy. This build-time variable is essential: the development proxy is not deployed. Audio analysis remains unavailable until the backend URL and matching CORS are configured.
+
+From Windows on an authorized connection, frontend-only CLI deployment is also supported:
+
+```powershell
+cd C:\Users\Mohit\VoxGuardAI-local
+# Pull the latest deployment configuration:
+git pull origin feature/voxguard-ai
+cd frontend
+npx vercel login
+npx vercel --prod
+```
+
+Login occurs through Vercel's own secure flow; never paste a token into chat. The workspace deployment attempt was blocked by proxy HTTP 403 at `vercel.com`, `api.vercel.com` and `auth.vercel.com`; no deployment URL or account project was created. Temporary-deployment fallback also failed. Publishing instructions/configuration is not evidence of a live site.

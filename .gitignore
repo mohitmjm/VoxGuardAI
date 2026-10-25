@@ -9,3 +9,5 @@ dist/
 *.pth
 .cache/
 artifacts/
+
+.vercel/
