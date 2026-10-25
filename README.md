@@ -23,7 +23,7 @@ On Windows use `.venv\Scripts\python.exe` instead of `.venv/bin/python`. Install
 ## Validation
 
 ```sh
-.venv/bin/python -m pytest tests research -q
+.venv/bin/python -m pytest tests research ml experiments -q
 cd frontend
 npm test -- --run
 npm run build
@@ -38,3 +38,5 @@ Research report dashboard: set `VOXGUARD_RESEARCH_REPORTS_PATH` to a trusted off
 Optional research speech embeddings are extracted separately; they are not a second validated detector. See `ml/README.md`. Windows can run `powershell -File scripts/run.ps1` after setup; a separate terminal runs `cd frontend; npm run dev`.
 
 Research validation: [single-command runner](research/validation/README.md), [dataset access and manual import](research/datasets/VALIDATION_ACCESS.md), and [reproducibility record](docs/RESEARCH_REPRODUCIBILITY.md). The IEEE-style manuscript source and compiled PDF are in `research/paper/`; representative validation/test data remain unavailable, and no deployment policy has been enabled.
+
+The resumed dataset sprint adds [exact requested-source acquisition/transfer](research/datasets/REQUESTED_SOURCES.md), [clustered uncertainty and frozen protocols](research/validation/README.md), and [matched hybrid comparisons](experiments/README.md). No new independent recordings or calibrated deployment policy were obtained; the source licenses remain unverified behind the proxy.

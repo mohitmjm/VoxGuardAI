@@ -46,10 +46,18 @@ Decoding uses FFmpeg mono float samples at 16 kHz. The API bounds upload size an
 
 Primary metrics are AUROC and interpolated EER; fixed-threshold metrics include precision, recall, F1, accuracy, FPR, FNR and confusion matrices. A separate two-threshold report includes coverage and abstentions. Validation fitting and test scoring verify model/protocol provenance and identity separation. Speaker-cluster bootstrap intervals are appropriate when sampling assumptions and sample counts support them. The tiny pilot does not support population-level confidence claims.
 
+\subsection{Exact-source acquisition sprint}
+On 25 October 2026, bounded authorized checks requested the raw dataset cards for \url{https://huggingface.co/datasets/mueller91/MLAAD-tiny} and \url{https://huggingface.co/datasets/mueller91/In-The-Wild}, and the API record for \url{https://zenodo.org/records/14498691}. Each failed at the configured proxy tunnel with HTTP 403 before a response body was available. Publisher provenance, recording licenses, partitions and file availability for these exact candidates therefore remain unverified. No new audio was acquired, no policy bypass occurred, and the historical pilot was not rerun in this sprint. Names and landing-page URLs are not license grants. A synthetic-only corpus cannot alone support a human/synthetic benchmark; the reference human corpus and channel mismatch require separate review.
+
+\subsection{Uncertainty and matched comparisons}
+Bootstrap units are connected components joining shared speaker/source identities, preserving related recordings and codec derivatives. The reporting guard requires ten components and one hundred valid resamples per metric from one thousand requested replicates; these engineering minima do not guarantee statistical coverage. Valid replicate counts and undefined single-class intervals are reported. Intervals conditional on a frozen validation-selected threshold do not quantify threshold-selection uncertainty; no test result may select that threshold. No population interval is asserted for the tiny historical pilot.
+
+The research-only comparison freezes learned-only, acoustic-only and fusion features, fits normalization on training rows, selects checkpoints by validation loss, and selects operating thresholds using validation only. AASIST and head predictions must align on identical test recording IDs and audio digests. Report per-seed metrics, head parameters and checkpoint bytes, and separate head-only latency from feature extraction and end-to-end cost. Numerical fixtures are software tests, not training evidence. No real head training or matched comparison was executed because a valid training/validation/test corpus was unavailable.
+
 \section{Results and Discussion}
-Table~\ref{tab:pilot} reports descriptive measurements only. All six convenience examples are rank-separated by the baseline; there is no validated operating threshold, binary accuracy or modern-generator claim. The 36 observations reuse six source recordings and are not 36 independent samples.
+Table~\ref{tab:pilot} retains historical descriptive measurements only; this sprint did not rerun the pilot. All six convenience examples are rank-separated by the baseline; there is no validated operating threshold, binary accuracy or modern-generator claim. The 36 observations reuse six source recordings and are not 36 independent samples.
 \begin{table}[t]\centering\small
-\caption{Tiny convenience pilot: 3 human and 3 classical Flite recordings. Descriptive ranking, not representative reliability.}\label{tab:pilot}
+\caption{Historical tiny convenience pilot: 3 human and 3 classical Flite recordings. Descriptive ranking, not representative reliability.}\label{tab:pilot}
 \begin{tabular}{lrrr}\hline
 Condition & Sources & AUROC & EER\\\hline
 Clean & 6 & 1.0 & 0.0\\

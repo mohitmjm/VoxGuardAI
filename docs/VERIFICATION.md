@@ -33,3 +33,9 @@ Docker build could not install FFmpeg because `deb.debian.org` could not resolve
 ## Research validation continuation
 
 The complete `pytest tests research ml -q` suite passed 93 tests (one upstream TestClient deprecation warning) using Python3.12/PyTorch2.6CPU. Node20.20.2 ran16 frontend tests successfully and the production build passed. Fresh Chromium uploads through Vite5190 to FastAPI8020 exercised actual human and classical synthetic speech, model-score display, JSON download, and mobile layout without mocks. No frontend/backend application logic was changed by the research continuation. The new engineering run deliberately reused the same six pilot recordings; no new representative corpus or production thresholds were obtained. See `research/validation/` for preserved evidence and exact reproduction.
+
+## Resumed dataset/hybrid sprint
+
+The completed `pytest tests research ml experiments -q` suite passed **145 tests** using Python3.12/PyTorch2.6 CPU (one upstream TestClient deprecation warning). The frontend passed **16 tests** under Node20.20.2 and its production build passed. Dependency checks and diff whitespace checks passed. CI and the verification script now include experimental unit tests so the new comparison protocol is exercised. Numerical hybrid/uncertainty fixtures are not measured benchmark data.
+
+No six-recording pilot experiment or new benchmark inference was rerun in this continuation. Zero new representative recordings were acquired; the exact requested-source rights and metadata remain unreadable behind the configured proxy. No production policy, reliability claim or public deployment was introduced. The updated PDF is four pages, uses the documented IEEE-style fallback, and explicitly states the unexecuted empirical comparisons. See `research/datasets/REQUESTED_SOURCES.md` and `experiments/README.md` for the remaining data prerequisite and runnable workflow.

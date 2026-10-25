@@ -11,3 +11,5 @@ Checks made during this research-validation pass. `reference_sources.json` store
 | WaveFake | Authors' `RUB-SysSec/WaveFake` README BibTeX | Joel Frank and Lea Schönherr; exact title; NeurIPS Datasets and Benchmarks Track; 2021. The code citation is not a license grant for linked recordings. |
 
 The verification is bibliographic, not a systematic re-review of all papers' experiments. Literature-reported EER or accuracy does not replace a matching locally evaluated baseline. RawNet2 remains unexecuted, and frozen wav2vec representations alone are not a competing spoof classifier. Authors should recheck target-venue citation style, full bibliographic metadata, final published versions and all claims before submission.
+
+Final dataset sprint: the existing official bibliography source records were retained, not represented as a new systematic literature review. Requested dataset card/API endpoints were unreadable; no dataset license or paper-specific experimental claim was inferred from those failures. They are acquisition candidates, not new verified scholarly citations.

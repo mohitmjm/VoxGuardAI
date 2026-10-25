@@ -32,3 +32,11 @@ Consult CLI `--help` and `research/README.md` for manifest scoring, policy fitti
 The paper directory includes Markdown, LaTeX/BibTeX, a generated actual-score plot and a compiled draft. Run the commands in `research/paper/README.md`. The delivered PDF used a two-column article fallback because IEEEtran was absent. It is not final IEEE venue formatting or a submission-ready empirical paper. References were checked against official repositories with verification scope in `references_verified.md`; no published accuracy figures are represented as project measurements.
 
 Windows PowerShell execution, optional CUDA, hosted CI and publication must be reported separately from local Linux tests. The latest research task does not authorize a Git push or public deployment.
+
+## Exact requested sources in the final dataset sprint
+
+On 2026-10-25, configured-proxy requests for the raw cards of `mueller91/MLAAD-tiny` and `mueller91/In-The-Wild` on Hugging Face, and Zenodo API record `14498691`, each failed with a tunnel HTTP 403. No license text, metadata body or recording was retrieved from those checks. Official publisher relationships and individual dataset/recording terms remain unverified here; do not fill a license field from memory or infer it from a repository name. See dataset acquisition records for exact requests and the permitted-machine download/transfer workflow. No pilot inference was repeated by this paper update.
+
+For a future model comparison, freeze identical held-out recording IDs/content digests across AASIST and all feature-head ablations. Head-only timing excludes feature extraction and must not be advertised as total application latency. Use source/speaker clusters for intervals and keep repeated codec observations in their cluster; disclose whether intervals condition on validation-selected thresholds. Numerical fixture metrics validate code only. Real head training and representative comparison are unexecuted, pending legitimate identity-audited train/validation/test data.
+
+The new uncertainty report uses connected speaker/source components, not individual augmented rows. Its minimum component/valid-resample guards are engineering checks rather than coverage guarantees; the six-recording pilot is below the reporting minimum. No new benchmark intervals were computed in this sprint.

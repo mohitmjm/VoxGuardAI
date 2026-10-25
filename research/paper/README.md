@@ -27,3 +27,7 @@ python research/paper/plot_pilot.py
 Matplotlib configuration/cache must be writable (`MPLCONFIGDIR` may be set to a task-local directory). Figure generation consumes `research/results/pilot_scores.csv`; no placeholder metric, invented recording, or decision threshold is generated.
 
 No new representative validation/test corpus was obtained in the latest acquisition pass. Correctly frozen operating thresholds, modern/unseen-generator evidence, representative uncertainty estimates, Indic-language evaluation and empirical hybrid comparisons are prerequisites for the intended empirical paper. Dataset access findings and manual-import instructions belong to `research/datasets/`. This draft must be updated from recorded evaluation outputs when those prerequisites become available.
+
+## Latest acquisition sprint
+
+The three exact requested candidate endpoints (Hugging Face `mueller91/MLAAD-tiny`, Zenodo record `14498691`, and Hugging Face `mueller91/In-The-Wild`) could not be inspected because the configured proxy denied the card/API requests. This draft does not assign them an unverified license or claim that their recordings were evaluated. No new representative audio, calibrated policy or real hybrid comparison was produced. Historical pilot figures remain historical; this update did not rerun them.
