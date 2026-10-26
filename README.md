@@ -2,6 +2,8 @@
 
 Research-oriented detection of AI-generated speech using genuine pretrained AASIST inference. No paid service or API key is required. Scores are uncalibrated model outputs, not authenticity probabilities. Classification remains **Uncertain** until thresholds are validated on representative held-out data. English benchmark training does not establish Hindi, Marathi, or unseen-generator performance.
 
+Complete project report: [read online](docs/PROJECT_DOCUMENTATION.md), [PDF](docs/VoxGuard_AI_Project_Report.pdf), or [editable Word document](docs/VoxGuard_AI_Project_Report.docx).
+
 ## Local development
 
 Python 3.11 or 3.12, Node 20+, and FFmpeg/ffprobe must be available.
