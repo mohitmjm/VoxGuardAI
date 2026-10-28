@@ -1,0 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.6.0+cpu
+gradio==5.49.1
+-r backend/requirements.txt
+-r ml/requirements.txt
