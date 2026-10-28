@@ -22,3 +22,5 @@ The intended frontend origin is https://voxguardai-frontend.vercel.app. Override
 After the Space starts, open its direct https://...hf.space/api/health address. Confirm ffmpeg_available and model.available, then configure Vercel VITE_API_BASE_URL to the direct Space origin (without /api or a trailing slash) and redeploy the frontend. Test an actual short speech upload from Vercel.
 
 Hosting access, free hardware eligibility, startup and idle limits must be verified in the user's account. The Space uses CPU inference; it does not request ZeroGPU acceleration. Packaging this service does not demonstrate that the selected host will accept or run it. Free hosting may sleep; always-on availability is not promised.
+
+The Space requirements are self-contained: Hugging Face installs this file from /tmp before copying application folders, so relative -r includes must not be used.
