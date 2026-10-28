@@ -2,7 +2,7 @@
 title: VoxGuard AI Backend
 emoji: 🎙️
 colorFrom: blue
-colorTo: cyan
+colorTo: blue
 sdk: gradio
 sdk_version: 5.49.1
 python_version: "3.12"
