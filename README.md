@@ -4,6 +4,8 @@ Research-oriented detection of AI-generated speech using genuine pretrained AASI
 
 Complete project report: [read online](docs/PROJECT_DOCUMENTATION.md), [PDF](docs/VoxGuard_AI_Project_Report.pdf), or [editable Word document](docs/VoxGuard_AI_Project_Report.docx).
 
+Current website presentation uses [custom score bands](docs/SCORE_DISPLAY.md) and light mode. Percentage scores are uncalibrated; the original backend classification is retained in report details and exports.
+
 ## Local development
 
 Python 3.11 or 3.12, Node 20+, and FFmpeg/ffprobe must be available.

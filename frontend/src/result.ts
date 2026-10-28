@@ -11,3 +11,16 @@ export function readiness(info:Record<string,unknown>|null, connected:boolean|nu
  if(info?.available===true)return "Checkpoint present — inference load not yet verified";
  return connected===true?"Backend connected — model readiness unknown":"Checking model readiness…";
 }
+
+// User-selected presentation bands, not calibrated probabilities or model policies.
+export const scoreBands = [
+ {id:'human', label:'Strong human-like signal', range:'0–<10%', min:0, max:.1},
+ {id:'mostly-human', label:'Mostly human-like signal', range:'10–<50%', min:.1, max:.5},
+ {id:'ai', label:'AI-like signal', range:'50–<80%', min:.5, max:.8},
+ {id:'strong-ai', label:'Strong AI-like signal', range:'80–100%', min:.8, max:1},
+] as const;
+export function scoreBand(score:number){
+ if(!Number.isFinite(score)||score<0||score>1)return null;
+ return scoreBands.find(b=>score<b.max) ?? scoreBands[3];
+}
+export function percentScore(score:number){return Number.isFinite(score)&&score>=0&&score<=1?`${(score*100).toFixed(1)}%`:'Unavailable';}

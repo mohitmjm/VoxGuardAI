@@ -11,13 +11,13 @@ function setup(){
  return render(<App/>);
 }
 describe('upload workspace',()=>{
- it('starts with an accessible disabled analysis action and toggles theme',()=>{setup();const analyze=screen.getByRole('button',{name:/Analyze recording/}) as HTMLButtonElement;expect(analyze.disabled).toBe(true);fireEvent.click(screen.getByRole('button',{name:/Switch to light mode/}));expect(document.documentElement.dataset.theme).toBe('light');});
+ it('starts in light mode with no theme toggle and a disabled analysis action',()=>{setup();const analyze=screen.getByRole('button',{name:/Analyze recording/}) as HTMLButtonElement;expect(analyze.disabled).toBe(true);expect(screen.queryByRole('button',{name:/Switch to .* mode/})).toBeNull();expect(document.documentElement.dataset.theme).toBe('light');});
  it('rejects invalid uploads with an actionable error',async()=>{const {container}=setup();fireEvent.change(container.querySelector('input')!,{target:{files:[new File(['bad'],'bad.exe')]}});expect(await screen.findByRole('alert')).toHaveProperty('textContent','Choose a WAV, MP3, M4A, or FLAC recording.');});
  it('uploads selected audio and renders genuine API-shaped uncertain output',async()=>{
  const {container}=setup();const fetchMock=vi.mocked(fetch);fetchMock.mockResolvedValueOnce({ok:true,json:async()=>({classification:'uncertain',score:.724,segments:[{start:0,end:2,score:.724}],model:{name:'AASIST'},limitations:['Not calibrated'],duration_seconds:2,sample_rate:16000,latency_ms:200})} as Response);
  fireEvent.change(container.querySelector('input')!,{target:{files:[new File(['audio'],'voice.wav',{type:'audio/wav'})]}});
  fireEvent.click(screen.getByRole('button',{name:/Analyze recording/}));
- await waitFor(()=>expect(screen.getByText('Uncertain')).toBeTruthy());expect(screen.getByText('0.724')).toBeTruthy();expect(screen.getByText(/Uncalibrated · not a probability/)).toBeTruthy();expect(fetchMock).toHaveBeenLastCalledWith('/api/analyze',expect.objectContaining({method:'POST',body:expect.any(FormData)}));
+ await waitFor(()=>expect(screen.getByText('AI-like signal',{selector:'.verdict'})).toBeTruthy());expect(screen.getByText('72.4%')).toBeTruthy();expect(screen.getByText(/Uncalibrated · not a probability/)).toBeTruthy();expect(fetchMock).toHaveBeenLastCalledWith('/api/analyze',expect.objectContaining({method:'POST',body:expect.any(FormData)}));
  });
  it('shows backend failure without producing a prediction',async()=>{const {container}=setup();vi.mocked(fetch).mockResolvedValueOnce({ok:false,json:async()=>({detail:'Model checkpoint is unavailable'})} as Response);fireEvent.change(container.querySelector('input')!,{target:{files:[new File(['audio'],'voice.wav')]}});fireEvent.click(screen.getByRole('button',{name:/Analyze recording/}));expect((await screen.findByRole('alert')).textContent).toContain('Model checkpoint is unavailable');expect(screen.queryByText('Uncertain')).toBeNull();});
 });
@@ -28,7 +28,7 @@ describe('report interaction and cancellation',()=>{
  it('seeks segments, follows playback, displays processing and exports report',async()=>{
   const {container}=setup();vi.mocked(fetch).mockResolvedValueOnce({ok:true,json:async()=>response} as Response);
   const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
-  select(container);await screen.findByText('Uncertain');
+  select(container);await screen.findByText('AI-like signal',{selector:'.verdict'});
   fireEvent.click(screen.getByRole('button',{name:/Seek to segment 2/}));
   const player=screen.getByLabelText('Uploaded recording playback') as HTMLAudioElement;
   expect(player.currentTime).toBe(2);expect(screen.getByText('Playback position: 2.0s')).toBeTruthy();
