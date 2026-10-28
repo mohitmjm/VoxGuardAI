@@ -1,5 +1,6 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.6.0+cpu
+# ZeroGPU accepts torch 2.8.0; keep this host-specific environment separate.
+torch==2.8.0
 gradio==5.49.1
 -r backend/requirements.txt
--r ml/requirements.txt
+numpy==1.26.4
+soundfile==0.13.1
